@@ -1,12 +1,30 @@
-﻿# CMakeList.txt: StratiumEngine.Core için CMake projesi, kaynağı ekleyin ve tanımlayın
-# projeye özgü mantık burada bulunur.
-#
+﻿# StratiumEngine.Core için CMake projesi
 
-# Kaynağı bu projenin yürütülebilir dosyasına ekleyin.
-add_executable (StratiumEngine.Core "StratiumEngine.Core.cpp" "StratiumEngine.Core.h")
+# Kaynak ve başlık dosyalarını otomatik ekle
+file(GLOB_RECURSE CORE_SOURCES "src/*.cpp")
+file(GLOB_RECURSE CORE_HEADERS "include/*.h" "include/*.hpp")
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET StratiumEngine.Core PROPERTY CXX_STANDARD 20)
+add_library(StratiumEngine.Core STATIC
+    ${CORE_SOURCES}
+    ${CORE_HEADERS}
+)
+
+# Public include dizini
+target_include_directories(StratiumEngine.Core PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/StratiumEngine
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+set_target_properties(StratiumEngine.Core PROPERTIES
+    CXX_STANDARD 23
+    CXX_STANDARD_REQUIRED YES
+)
+
+# Platformlara özel makrolar
+if(WIN32)
+    target_compile_definitions(StratiumEngine.Core PUBLIC STRATIUM_PLATFORM_WINDOWS)
+elseif(UNIX AND NOT APPLE)
+    target_compile_definitions(StratiumEngine.Core PUBLIC STRATIUM_PLATFORM_LINUX)
 endif()
 
-# TODO: Gerekirse testleri ve yükleme hedeflerini ekleyin.
+# Gerekirse bağımlılıklar ve tanımlar ekleyin
